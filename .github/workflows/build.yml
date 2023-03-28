@@ -23,20 +23,8 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobsJSON=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux)
-
-          # Push derivations
-          while IFS= read -r job; do
-            drvPath=$(echo "$job" | jq -r .drvPath)
-            cachix push nixpkgs-maintained "$drvPath"
-          done <<< "$jobsJSON"
-
-          jobs=$(echo "$jobsJSON" | nix run nixpkgs#jq -- -c -s .)
-
-          cachix push nixpkgs-maintained /nix/store/s700l2cd59bnsfppzsxv9ysvmn5gyg3c-cowsay-3.7.0.drv
-
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s .)
           echo matrix="$jobs" >> $GITHUB_OUTPUT
-
   nix-build:
     needs: nix-eval-jobs
     strategy:
@@ -54,4 +42,4 @@ jobs:
         with:
           name: nixpkgs-maintained
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - run: nix build ${{ matrix.package.drvPath }}
+      - run: nix build .#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}
