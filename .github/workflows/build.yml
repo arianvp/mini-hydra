@@ -31,9 +31,9 @@ jobs:
       matrix:
         package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest 
-    if: ${{ matrix.package.isCached == false }}
     steps:
       - uses: actions/checkout@v3
+        if: ${{ matrix.package.isCached == false }}
       - uses: cachix/install-nix-action@v20
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
