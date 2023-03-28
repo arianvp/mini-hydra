@@ -39,8 +39,11 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
             accept-flake-config = true
+        if: ${{ matrix.package.isCached == false }}
       - uses: cachix/cachix-action@v12
         with:
           name: nixpkgs-maintained
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+        if: ${{ matrix.package.isCached == false }}
       - run: nix build .#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}
+        if: ${{ matrix.package.isCached == false }}
