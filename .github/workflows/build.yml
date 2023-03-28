@@ -32,7 +32,7 @@ jobs:
             fi
           done <<< "$jobs"
 
-          matrix=$(echo $jobs | nix run nixpkgs#jq -- -c -s '.|select(.isCached == false)'))
+          matrix=$(echo $jobs | nix run nixpkgs#jq -- -c -s '.|select(.isCached == false)')
           echo matrix="$matrix" >> $GITHUB_OUTPUT
   nix-build:
     needs: nix-eval-jobs
