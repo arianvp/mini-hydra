@@ -7,7 +7,7 @@ jobs:
   nix-eval-jobs:
     runs-on: ubuntu-latest
     outputs:
-          matrix: ${{ steps.nix-eval-jobs.outputs.jobs }}
+          matrix: ${{ steps.nix-eval-jobs.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
@@ -20,13 +20,13 @@ jobs:
         shell: bash
         run: |
           jobs=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s .)
-          echo jobs="$jobs" >> $GITHUB_OUTPUT
+          echo matrix="$jobs" >> $GITHUB_OUTPUT
 
   nix-build:
     needs: nix-eval-jobs
     strategy:
       matrix:
-        jobs: ${{ fromJSON(needs.nix-eval-jobs.outputs.jobs) }}
+        package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest # TODO: job
     steps:
       - uses: actions/checkout@v3
@@ -35,4 +35,6 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
             accept-flake-config = true
-      - run: nix build .#packages.${{ matrix.jobs.system }}.${{ matrix.jobs.attr }}
+      - name: ".#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}"
+        run:
+          nix-store --realise ${{ matrix.package.drvPath }}
