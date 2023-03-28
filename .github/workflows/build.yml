@@ -35,6 +35,7 @@ jobs:
           echo matrix="$matrix" >> $GITHUB_OUTPUT
   nix-build:
     needs: nix-eval-jobs
+    if: ${{ needs.nix-eval-jobs.outputs.matrix != '[]' }}
     strategy:
       matrix:
         package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
