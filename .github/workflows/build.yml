@@ -23,7 +23,7 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobs=$(nix run github:nix-community/nix-eval-jobs -- --check-cache-status --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s '.|filter(.isCached == false)')
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --check-cache-status --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s '.|select(.isCached == false)')
           echo matrix="$jobs" >> $GITHUB_OUTPUT
   nix-build:
     needs: nix-eval-jobs
