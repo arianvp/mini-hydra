@@ -24,6 +24,9 @@ jobs:
         shell: bash
         run: |
           jobs=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s .)
+
+          cachix push nixpkgs-maintained /nix/store/i5sbb42dzpjn9ixrd4nswcjzr0lb4c2g-hello-2.12.1.drv
+
           echo matrix="$jobs" >> $GITHUB_OUTPUT
 
   nix-build:
