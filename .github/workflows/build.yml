@@ -19,7 +19,7 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobs=$(run nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -s .)
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -s .)
           echo matrix="$jobs" >> $GITHUB_OUTPUT
 
   nix-build:
