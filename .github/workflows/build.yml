@@ -23,14 +23,15 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobs=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s .)
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --check-cache-status --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s .)
           echo matrix="$jobs" >> $GITHUB_OUTPUT
   nix-build:
     needs: nix-eval-jobs
     strategy:
       matrix:
         package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
-    runs-on: ubuntu-latest # TODO: job
+    runs-on: ubuntu-latest 
+    if: ${{ matrix.package.isCached == false }}
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
