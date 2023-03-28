@@ -1,0 +1,28 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+jobs:
+  nix-eval-jobs:
+    runs-on: ubuntu-latest
+    outputs:
+          matrix: ${{ steps.nix-eval-jobs.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v20
+      - id: nix-eval-jobs
+        run: |
+          echo matrix=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux  | nix run jq -- -s .) >> $GITHUB_OUTPUT
+
+  nix-build:
+    needs: nix-eval-jobs
+    strategy:
+      matrix: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix )}}
+    runs-on: ubuntu-latest # TODO: job
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v20
+      - name: ".#packages.${{ matrix.system }}.${{ matrix.attr }}"
+        run:
+          nix-store --realise ${{ matrix.drvPath }}
