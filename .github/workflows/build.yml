@@ -23,8 +23,17 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobs=$(nix run github:nix-community/nix-eval-jobs -- --check-cache-status --flake .#packages.x86_64-linux | nix run nixpkgs#jq -- -c -s '.|select(.isCached == false)')
-          echo matrix="$jobs" >> $GITHUB_OUTPUT
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --check-cache-status --flake .#packages.x86_64-linux)
+          while read -r line; do
+            isCached=$(echo "$line" | nix run nixpkgs#jq -- -r '.isCached')
+            drvPath=$(echo "$line" | nix run nixpkgs#jq -- -r '.drvPath')
+            if [[ "$isCached" == "false" ]]; then
+              cachix push nixpkgs-maintained "$drvPath"
+            fi
+          done <<< "$jobs"
+
+          matrix=$(echo $jobs | nix run nixpkgs#jq -- -c -s '.|select(.isCached == false)'))
+          echo matrix="$matrix" >> $GITHUB_OUTPUT
   nix-build:
     needs: nix-eval-jobs
     strategy:
@@ -32,7 +41,6 @@ jobs:
         package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest 
     steps:
-      - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
@@ -42,4 +50,5 @@ jobs:
         with:
           name: nixpkgs-maintained
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - run: nix build .#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}
+      - name: nix build .#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}
+        run: nix build ${{{ matrix.package.drvPath }}}
