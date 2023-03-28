@@ -23,7 +23,7 @@ jobs:
         name: nix-eval-jobs
         shell: bash
         run: |
-          jobs=$(nix run github:nix-community/nix-eval-jobs -- --workers 2 --check-cache-status --flake .#packages.x86_64-linux)
+          jobs=$(nix run github:nix-community/nix-eval-jobs -- --workers 2 --force-recurse --check-cache-status --flake .#hydraJobs)
           while read -r line; do
             isCached=$(echo "$line" | nix run nixpkgs#jq -- -r '.isCached')
             drvPath=$(echo "$line" | nix run nixpkgs#jq -- -r '.drvPath')
@@ -50,5 +50,5 @@ jobs:
         with:
           name: nixpkgs-maintained
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: nix build .#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}
+      - name: nix build .#hydraJobs.${{ matrix.package.attr }} --system ${{ matrix.package.system }}}
         run: nix build ${{ matrix.package.drvPath }}

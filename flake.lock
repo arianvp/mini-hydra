@@ -73,7 +73,44 @@
     "root": {
       "inputs": {
         "nix-eval-jobs": "nix-eval-jobs",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "webauthn-oidc": "webauthn-oidc"
+      }
+    },
+    "utils": {
+      "locked": {
+        "lastModified": 1659877975,
+        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "webauthn-oidc": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": "utils"
+      },
+      "locked": {
+        "lastModified": 1669229692,
+        "narHash": "sha256-ZdxrIjFdHSIBKS7qFQjbKmnMCeWO4JLi+mZC0pRNrls=",
+        "owner": "arianvp",
+        "repo": "webauthn-oidc",
+        "rev": "c0251f45ab01740ac4d636ad590f9b7b63552331",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arianvp",
+        "repo": "webauthn-oidc",
+        "type": "github"
       }
     }
   },
