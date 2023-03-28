@@ -25,7 +25,8 @@ jobs:
   nix-build:
     needs: nix-eval-jobs
     strategy:
-      matrix: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix )}}
+      matrix:
+        package: ${{ fromJSON(needs.nix-eval-jobs.outputs.matrix) }}
     runs-on: ubuntu-latest # TODO: job
     steps:
       - uses: actions/checkout@v3
@@ -34,6 +35,6 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
           extra_nix_config: |
             accept-flake-config = true
-      - name: ".#packages.${{ matrix.system }}.${{ matrix.attr }}"
+      - name: ".#packages.${{ matrix.package.system }}.${{ matrix.package.attr }}"
         run:
-          nix-store --realise ${{ matrix.drvPath }}
+          nix-store --realise ${{ matrix.package.drvPath }}
