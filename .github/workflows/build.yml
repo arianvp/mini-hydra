@@ -52,3 +52,4 @@ jobs:
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: nix build .#hydraJobs.${{ matrix.package.attr }} --system ${{ matrix.package.system }}}
         run: nix build ${{ matrix.package.drvPath }}
+        if: ${{ matrix.package.isCached == false }}
