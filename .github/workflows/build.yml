@@ -16,9 +16,11 @@ jobs:
           extra_nix_config: |
             accept-flake-config = true
       - id: nix-eval-jobs
+        name: nix-eval-jobs
+        shell: bash
         run: |
-          set -euo pipefail
-          echo matrix=$(nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux  | nix run jq -- -s .) >> $GITHUB_OUTPUT
+          jobs=$(run nix run github:nix-community/nix-eval-jobs -- --flake .#packages.x86_64-linux | nix run jq -- -s .)
+          echo matrix="$jobs" >> $GITHUB_OUTPUT
 
   nix-build:
     needs: nix-eval-jobs
