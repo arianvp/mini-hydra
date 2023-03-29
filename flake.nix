@@ -5,7 +5,6 @@
     url = "github:arianvp/webauthn-oidc";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.nixos-stuff.url =  "github:arianvp/nixos-stuff";
   outputs = { self, nixpkgs, nix-eval-jobs, webauthn-oidc, nixos-stuff }: {
     packages.x86_64-linux = {
       inherit (nixpkgs.legacyPackages.x86_64-linux) hello cowsay fortune;
@@ -16,7 +15,6 @@
     hydraJobs = {
       external.webauthn-oidc = webauthn-oidc.defaultPackage.x86_64-linux;
       packages = self.packages.x86_64-linux;
-      external.nixos-stuff = nixos-stuff;
     };
   };
 }
